@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NekoPlus.Ivory.Lexical;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,15 @@ namespace NekoPlus.Ivory.Shell
     {
         static void Main(string[] args)
         {
+            Analyzer analyzer = new Analyzer();
+            analyzer.Scanner.Read("6554.0");
+            Token token = analyzer.Scanner.Number();
+            if(token!=null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+            Console.Write(":");
+            Console.ReadKey();
         }
     }
 }
