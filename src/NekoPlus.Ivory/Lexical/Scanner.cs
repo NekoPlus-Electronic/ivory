@@ -24,27 +24,48 @@ namespace NekoPlus.Ivory.Lexical
             buffer.Append(s);
         }
 
-
-        public Token Number()
+        public Token Scan()
         {
-            length = 0;
             if (!Next())
                 return null;
-            if (!char.IsDigit(buffer[index]))
+            return null;
+        }
+
+        public Token String()
+        {
+            if (!Next())
+                return null;
+            if(Now()!='\'')
             {
                 Back();
                 return null;
             }
-            if (buffer[index] == '0')
+            while (Next())
+            {
+                if (Now() == '\'')
+                    return Generate(TokenType.String);
+            }
+            return Error(1001);
+        }
+
+        public Token Number()
+        {
+            if (!Next())
+                return null;
+            if (!char.IsDigit(Now()))
+            {
+                Back();
+                return null;
+            }
+            if (Now() == '0')
             {
                 if (!Next())
                     return Generate(TokenType.Number);
-                if (buffer[index] == 'x' || buffer[index]=='X')
+                if (Now() == 'x' || Now()=='X')
                 {
                     if (!Next()||!IsHexChar())
                     {
-                        _analyzer.Report(1013);
-                        return null;
+                        return Error(1000);
                     }
                     while(Next())
                     {
@@ -56,21 +77,20 @@ namespace NekoPlus.Ivory.Lexical
                     }
                     return Generate(TokenType.Number);
                 }
-                if (buffer[index]=='.')
+                if (Now()=='.')
                 {
                     if(!Next())
                     {
-                        _analyzer.Report(1013);
-                        return null;
+                        return Error(1000);
                     }
-                    if (!char.IsDigit(buffer[index]))
+                    if (!char.IsDigit(Now()))
                     {
                         Back();
                         return Generate(TokenType.Number);
                     }
                     while (Next())
                     {
-                        if (!char.IsDigit(buffer[index]))
+                        if (!char.IsDigit(Now()))
                         {
                             Back();
                             break;
@@ -78,28 +98,26 @@ namespace NekoPlus.Ivory.Lexical
                     }
                     return Generate(TokenType.Number);
                 }
-                _analyzer.Report(1013);
-                return null;
+                return Error(1000);
             }
             while (Next())
             {
-                if (!char.IsDigit(buffer[index]))
+                if (!char.IsDigit(Now()))
                 {
-                    if (buffer[index] == '.')
+                    if (Now() == '.')
                     {
                         if (!Next())
                         {
-                            _analyzer.Report(1013);
-                            return null;
+                            return Error(1000);
                         }
-                        if (!char.IsDigit(buffer[index]))
+                        if (!char.IsDigit(Now()))
                         {
                             Back();
                             return Generate(TokenType.Number);
                         }
                         while (Next())
                         {
-                            if (!char.IsDigit(buffer[index]))
+                            if (!char.IsDigit(Now()))
                             {
                                 Back();
                                 break;
@@ -114,14 +132,30 @@ namespace NekoPlus.Ivory.Lexical
             return Generate(TokenType.Number);
         }
 
-        Token Generate(TokenType type) => new Token(type, buffer.ToString(index-length+1, length));
+        Token Generate(TokenType type)
+        {
+            Token token = new Token(type, buffer.ToString(index - length + 1, length));
+            length = 0;
+            return token;
+        }
+
+        Token Error(int code)
+        {
+            _analyzer.Report(code);
+            return null;
+        }
 
         bool IsHexChar()
         {
-            char c = buffer[index];
+            char c = Now();
             if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
                 return true;
             return false;
+        }
+
+        char Now()
+        {
+            return buffer[index];
         }
 
         bool Next()

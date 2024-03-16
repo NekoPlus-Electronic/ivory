@@ -12,9 +12,14 @@ namespace NekoPlus.Ivory.Shell
         static void Main(string[] args)
         {
             Analyzer analyzer = new Analyzer();
-            analyzer.Scanner.Read("6554.0");
+            analyzer.Scanner.Read("6554.1\'45744srysg\'");
             Token token = analyzer.Scanner.Number();
             if(token!=null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+            token = analyzer.Scanner.String();
+            if (token != null)
                 Console.WriteLine(token.Lexeme);
             else
                 Console.WriteLine("null");

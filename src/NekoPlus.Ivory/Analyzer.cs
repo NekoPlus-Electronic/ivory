@@ -1,6 +1,7 @@
 ﻿using NekoPlus.Ivory.Lexical;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace NekoPlus.Ivory
@@ -16,10 +17,8 @@ namespace NekoPlus.Ivory
 
         public void Report(int code)
         {
-            string msg = "";
-            if (code == 1013)
-                msg = "无效数字";
-            Console.WriteLine($"{code} {msg}");
+            Error error = Error.Errors.First(x => x.Code == code)??new Error(code,ErrorLevel.Error,"");
+            Console.WriteLine($"{error.Code} {error.Message}");
         }
     }
 }
