@@ -33,6 +33,7 @@ namespace NekoPlus.Ivory.Lexical
 
         public Token String()
         {
+            Trim();
             if (!Next())
                 return null;
             if(Now()!='\'')
@@ -50,6 +51,7 @@ namespace NekoPlus.Ivory.Lexical
 
         public Token Number()
         {
+            Trim();
             if (!Next())
                 return null;
             if (!char.IsDigit(Now()))
@@ -153,17 +155,34 @@ namespace NekoPlus.Ivory.Lexical
             return false;
         }
 
+        int Trim()
+        {
+            int count = 0;
+            while(Next(true))
+            {
+                char c = Now();
+                if (!char.IsWhiteSpace(c) || c == '\r' || c == '\n')
+                {
+                    index--;
+                    break;
+                }
+                count++;
+            }
+            return count;
+        }
+
         char Now()
         {
             return buffer[index];
         }
 
-        bool Next()
+        bool Next(bool eat=false)
         {
             if (index> buffer.Length-2)
                 return false;
             index++;
-            length++;
+            if (!eat)
+                length++;
             return true;
         }
 
