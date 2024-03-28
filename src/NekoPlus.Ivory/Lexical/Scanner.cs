@@ -22,7 +22,6 @@ namespace NekoPlus.Ivory.Lexical
             _analyzer = analyzer;
         }
 
-
         public void Read(string s)
         {
             buffer.Append(s);
@@ -33,6 +32,27 @@ namespace NekoPlus.Ivory.Lexical
             if (!Next())
                 return null;
             return null;
+        }
+
+        public Token LineBreak()
+        {
+            Trim();
+            if (!Next())
+                return null;
+            if(Now!='\r'&&Now!='\n')
+            {
+                Back();
+                return null;
+            }
+            while(Next())
+            {
+                if (Now != '\r' && Now != '\n')
+                {
+                    Back();
+                    break;
+                }
+            }
+            return Generate(TokenType.LineBreak);
         }
 
         public Token String()
@@ -167,9 +187,8 @@ namespace NekoPlus.Ivory.Lexical
             return false;
         }
 
-        int Trim()
+        void Trim()
         {
-            int count = 0;
             while(Next(true))
             {
                 char c = Now;
@@ -178,9 +197,7 @@ namespace NekoPlus.Ivory.Lexical
                     index--;
                     break;
                 }
-                count++;
             }
-            return count;
         }
 
         bool Next(bool eat=false)

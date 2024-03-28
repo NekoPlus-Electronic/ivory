@@ -6,9 +6,10 @@ namespace NekoPlus.Ivory.Lexical
 {
     public enum TokenType
     {
-        Keyword,
-        Identifier,
+        LineBreak,
         Operator,
+        Identifier,
+        Keyword,
         Number,
         String,
     }

@@ -12,7 +12,7 @@ namespace NekoPlus.Ivory.Shell
         static void Main(string[] args)
         {
             Analyzer analyzer = new Analyzer();
-            analyzer.Scanner.Read("     6554.1    \'45744srysg\'    ");
+            analyzer.Scanner.Read("     6554.1    \'45744srysg\'    \r  41.0 \n\r\r\n \'\'");
             Token token = analyzer.Scanner.Number();
             if(token!=null)
                 Console.WriteLine(token.Lexeme);
@@ -23,6 +23,27 @@ namespace NekoPlus.Ivory.Shell
                 Console.WriteLine(token.Lexeme);
             else
                 Console.WriteLine("null");
+            token = analyzer.Scanner.LineBreak();
+            if (token != null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+            token = analyzer.Scanner.Number();
+            if (token != null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+            token = analyzer.Scanner.LineBreak();
+            if (token != null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+            token = analyzer.Scanner.String();
+            if (token != null)
+                Console.WriteLine(token.Lexeme);
+            else
+                Console.WriteLine("null");
+
             Console.Write(":");
             Console.ReadKey();
         }
