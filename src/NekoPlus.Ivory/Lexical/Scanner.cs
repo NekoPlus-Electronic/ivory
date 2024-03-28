@@ -7,17 +7,21 @@ namespace NekoPlus.Ivory.Lexical
 {
     public class Scanner
     {
+        StringBuilder buffer = new StringBuilder();
+
+        int index = -1;
+        int length = 0;
+
         Analyzer _analyzer;
         public Analyzer Analyzer => _analyzer;
+
+        public char Now => buffer[index];
+
         public Scanner(Analyzer analyzer)
         {
             _analyzer = analyzer;
         }
 
-        StringBuilder buffer=new StringBuilder();
-
-        int index=-1;
-        int length=0;
 
         public void Read(string s)
         {
@@ -36,14 +40,14 @@ namespace NekoPlus.Ivory.Lexical
             Trim();
             if (!Next())
                 return null;
-            if(Now()!='\'')
+            if(Now!='\'')
             {
                 Back();
                 return null;
             }
             while (Next())
             {
-                if (Now() == '\'')
+                if (Now == '\'')
                     return Generate(TokenType.String);
             }
             return Error(1001);
@@ -54,16 +58,16 @@ namespace NekoPlus.Ivory.Lexical
             Trim();
             if (!Next())
                 return null;
-            if (!char.IsDigit(Now()))
+            if (!IsDigitChar())
             {
                 Back();
                 return null;
             }
-            if (Now() == '0')
+            if (Now == '0')
             {
                 if (!Next())
                     return Generate(TokenType.Number);
-                if (Now() == 'x' || Now()=='X')
+                if (Now == 'x' || Now=='X')
                 {
                     if (!Next()||!IsHexChar())
                     {
@@ -79,20 +83,20 @@ namespace NekoPlus.Ivory.Lexical
                     }
                     return Generate(TokenType.Number);
                 }
-                if (Now()=='.')
+                if (Now=='.')
                 {
                     if(!Next())
                     {
                         return Error(1000);
                     }
-                    if (!char.IsDigit(Now()))
+                    if (!IsDigitChar())
                     {
                         Back();
                         return Generate(TokenType.Number);
                     }
                     while (Next())
                     {
-                        if (!char.IsDigit(Now()))
+                        if (!IsDigitChar())
                         {
                             Back();
                             break;
@@ -104,22 +108,22 @@ namespace NekoPlus.Ivory.Lexical
             }
             while (Next())
             {
-                if (!char.IsDigit(Now()))
+                if (!IsDigitChar())
                 {
-                    if (Now() == '.')
+                    if (Now == '.')
                     {
                         if (!Next())
                         {
                             return Error(1000);
                         }
-                        if (!char.IsDigit(Now()))
+                        if (!IsDigitChar())
                         {
                             Back();
                             return Generate(TokenType.Number);
                         }
                         while (Next())
                         {
-                            if (!char.IsDigit(Now()))
+                            if (!IsDigitChar())
                             {
                                 Back();
                                 break;
@@ -147,9 +151,17 @@ namespace NekoPlus.Ivory.Lexical
             return null;
         }
 
+        bool IsDigitChar()
+        {
+            char c = Now;
+            if (c >= '0' && c <= '9')
+                return true;
+            return false;
+        }
+
         bool IsHexChar()
         {
-            char c = Now();
+            char c = Now;
             if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))
                 return true;
             return false;
@@ -160,7 +172,7 @@ namespace NekoPlus.Ivory.Lexical
             int count = 0;
             while(Next(true))
             {
-                char c = Now();
+                char c = Now;
                 if (!char.IsWhiteSpace(c) || c == '\r' || c == '\n')
                 {
                     index--;
@@ -169,11 +181,6 @@ namespace NekoPlus.Ivory.Lexical
                 count++;
             }
             return count;
-        }
-
-        char Now()
-        {
-            return buffer[index];
         }
 
         bool Next(bool eat=false)
